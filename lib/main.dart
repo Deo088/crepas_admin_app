@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'core/theme/app_theme.dart';
+import 'core/widgets/main_navigation.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -12,8 +16,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Crepas Admin',
-      theme: ThemeData(colorSchemeSeed: Colors.pink, useMaterial3: true),
-      home: const Scaffold(body: Center(child: Text('Crepas Admin App'))),
+      theme: AppTheme.darkTheme,
+      home: const MainNavigation(),
     );
   }
 }
