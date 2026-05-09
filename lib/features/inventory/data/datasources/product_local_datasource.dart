@@ -20,4 +20,21 @@ class ProductLocalDataSource {
       (index) => ProductModel.fromMap(maps[index]),
     );
   }
+
+  Future<void> deleteProduct(int id) async {
+    final Database db = await AppDatabase.database;
+
+    await db.delete('products', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<void> updateProduct(ProductModel product) async {
+    final Database db = await AppDatabase.database;
+
+    await db.update(
+      'products',
+      product.toMap(),
+      where: 'id = ?',
+      whereArgs: [product.id],
+    );
+  }
 }
