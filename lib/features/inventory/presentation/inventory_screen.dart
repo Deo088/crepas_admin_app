@@ -83,6 +83,59 @@ class _InventoryScreenState extends State<InventoryScreen> {
   }
 
   void showAddProductDialog() {
+    editingProduct = null;
+
+    nameController.clear();
+    priceController.clear();
+    categoryController.clear();
+
+    showProductDialog();
+
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: Text(editingProduct == null ? 'Add Product' : 'Edit Product'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nameController,
+                  decoration: const InputDecoration(labelText: 'Product Name'),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: priceController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: 'Price'),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: categoryController,
+                  decoration: const InputDecoration(labelText: 'Category'),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: addProduct,
+              child: Text(editingProduct == null ? 'Save' : 'Update'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showProductDialog() {
     showDialog(
       context: context,
       builder: (_) {
@@ -134,7 +187,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
     priceController.text = product.price.toString();
     categoryController.text = product.category;
 
-    showAddProductDialog();
+    showProductDialog();
   }
 
   void showDeleteDialog(ProductModel product) {
@@ -177,33 +230,97 @@ class _InventoryScreenState extends State<InventoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Inventory')),
+      appBar: AppBar(
+        title: const Text(
+          'Inventory',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: showAddProductDialog,
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.add, size: 30),
       ),
       body: products.isEmpty
-          ? const Center(child: Text('No products yet'))
+          ? const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.inventory_2_outlined,
+                    size: 80,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'No products yet',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Tap the + button to add products',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ],
+              ),
+            )
           : ListView.builder(
+              padding: const EdgeInsets.all(12),
               itemCount: products.length,
               itemBuilder: (context, index) {
                 final product = products[index];
 
                 return Card(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
+                  elevation: 3,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   child: ListTile(
+                    contentPadding: const EdgeInsets.all(16),
                     onTap: () {
                       editProduct(product);
                     },
                     onLongPress: () {
                       showDeleteDialog(product);
                     },
-                    title: Text(product.name),
-                    subtitle: Text(product.category),
-                    trailing: Text('\$${product.price.toStringAsFixed(2)}'),
+                    leading: CircleAvatar(
+                      radius: 24,
+                      child: Text(product.name.substring(0, 1).toUpperCase()),
+                    ),
+                    title: Text(
+                      product.name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.pink.shade50,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          product.category,
+                          style: TextStyle(
+                            color: Colors.pink.shade700,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                    trailing: Text(
+                      '\$${product.price.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
                   ),
                 );
               },
